@@ -1,0 +1,24 @@
+!!!
+%html
+  %head
+    %title The Visible Kilgour : Searchable, Permalinkable, Downloadable Authority Record
+    %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}
+  %body
+    %h1 The Visible Kilgour
+    .concept
+      %p
+        The Visible Kilgour is a project to provide a searchable, permalinkable, and downloadable source of authority files on the web.
+      %p
+        This project uses seed data from the 
+        %a{:href=>"http://www.ibiblio.org/fred2.0/authorities/"} Fred 2.0
+        project and updates itself by whatever means available.
+      %p
+        You can 
+        %a{:href=>"/browse/"} Browse 
+        through the headings.
+      %p
+        Fulltext, faceted searching is also provided:
+        %form{:action=>"/search/"}
+          %input{:type=>"text", :size=>20,:class=>"smallSearch", :name=>"query"}
+          %input{:type=>"submit", :class=>"smallSearch", :value=>"Search"}
+        

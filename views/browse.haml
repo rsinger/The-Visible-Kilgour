@@ -1,0 +1,36 @@
+!!!
+%html
+  %head
+    %title Browse headings
+    %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}    
+  %body
+    .nav
+      %form{:action=>"/search/"}
+        %ul.nav
+          %li
+            %a{:href=>"/"} Home
+          %li
+            %a{:href=>"/browse/"} Browse
+          %li         
+            %input{:type=>"text", :size=>20,:class=>"smallSearch", :name=>"query"}
+            %input{:type=>"submit", :class=>"smallSearch", :value=>"Search"}  
+    .searchResults
+      .pageLinks
+        - if @prev
+          .previousLink
+            %a{:href=>"/browse/#{@prev.first}"} Previous
+        .nextLink      
+          %a{:href=>"/browse/#{@terms.last[:label]}"} Next    
+      %dl.searchResults
+        - @terms.each do |term|
+          %dt{:class=>"list#{term[:heading_type].gsub(/[\s\/]/,"")}"}
+            %a{:href=>"/lccn/#{term[:lccn]}"}= term[:label]
+          %dd{:class=>"list#{term[:heading_type].gsub(/[\s\/]/,"")}"}
+            -if term[:alt_labels] && !term[:alt_labels].empty?
+              Use for: #{[*term[:alt_labels]].join(", ")}
+      .pageLinks
+        - if @prev
+          .previousLink
+            %a{:href=>"/browse/#{@prev.first}"} Previous
+        .nextLink      
+          %a{:href=>"/browse/#{@terms.last[:label]}"} Next      

@@ -1,0 +1,104 @@
+!!!
+%html
+  %head
+    %title= @record[:label]
+    %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}    
+  %body
+    .nav
+      %form{:action=>"/search/"}
+        %ul.nav
+          %li
+            %a{:href=>"/"} Home
+          %li
+            %a{:href=>"/browse/"} Browse
+          %li         
+            %input{:type=>"text", :size=>20,:class=>"smallSearch", :name=>"query"}
+            %input{:type=>"submit", :class=>"smallSearch", :value=>"Search"}
+    .concept
+      .labels
+        %h1= @record[:label]
+        - if @record[:alt_labels] && !@record[:alt_labels].empty?
+          .altLabels
+            Use For:
+            %ul{:class=>"altLabelList"}
+              - [*@record[:alt_labels]].each do |alt|
+                %li= alt
+
+
+      %div{:class=>"HeadingType #{@record[:heading_type].gsub(/[\s\/]/,"")}"}
+        %h4=@record[:heading_type]
+      .meta
+        - if @record[:broader_str]
+          .broaderTerm
+            %strong Broader:
+            %ul
+              -[*@record[:broader_str]].each do |broader|
+                %li
+                  %a{:href=>"/label/#{CGI.escape(broader)}"}= broader
+              
+
+        - if @record[:narrower_str]
+          .narrowerTerm
+            %strong Narrower:
+            %ul
+              -[*@record[:narrower_str]].each do |narrower|
+                %li
+                  %a{:href=>"/label/#{CGI.escape(narrower)}"}= narrower
+              
+        - if @record[:related_str]
+          .relatedTerm
+            %strong Related:
+            %ul
+              -[*@record[:related_str]].each do |related|
+                %li
+                  %a{:href=>"/label/#{CGI.escape(related)}"}= related
+              
+        - if @record[:top_term_str] && term_cluster(@record[:top_term_str]).length > 1
+          .clusterTerm
+            %strong Heading group:
+            %a{:href=>"/group/#{CGI.escape(@record[:top_term_str])}"}= @record[:top_term_str]
+        - if @record[:x_str]
+          .generalSubd
+            %strong General Subdivision:
+            %ul
+              - [*@record[:x_str]].each do |x|
+                %li
+                  %a{:href=>"/search/?query=#{@record[:top_term_str]}&x=#{x}"}= x
+        - if @record[:z_str]
+          .geogSubd
+            %strong Geographic Subdivision:
+            - [*@record[:z_str]].each do |z|
+              %a{:href=>"/search/?query=#{@record[:top_term_str]}&z=#{z}"}= z          
+
+        - if @record[:v_str]
+          .formSubd
+            %strong Form Subdivision:
+            - [*@record[:v_str]].each do |v|
+              %a{:href=>"/search/?query=#{@record[:top_term_str]}&v=#{v}"}= v
+        - if @record[:y_str]
+          .chronSubd
+            %strong Chronological Subdivision:
+            - [*@record[:y_str]].each do |y|
+              %a{:href=>"/search/?query=#{@record[:top_term_str]}&y=#{y}"}= y
+        %h4 MARC:
+        .ldr LEADER: #{@record[:marc].leader.to_s}
+        - @record[:marc].each do |field|
+          %div{:class=>field.tag} #{field.to_s}
+
+
+
+    .rightColumn
+      %ul.browseFromHere
+        -browse_from_here(@record[:label]).each do |term|
+          %li
+            %a{:href=>"/lccn/#{term[:lccn]}"}= term[:label]
+      %a{:href=>"/browse/#{CGI.escape(@record[:label])}"} Browse from here
+      .downloads
+        %strong Download:
+        %ul.download
+          %li
+            %a{:href=>"/lccn/#{@record[:lccn]}.marcxml"} MARC XML
+          %li
+            %a{:href=>"/lccn/#{@record[:lccn]}.mrc"} MARC 21          
+      
+                        

@@ -1,0 +1,282 @@
+body {
+  margin-left: 1%;
+  margin-right: 1%;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  font-family: "arial","helvetica","verdana", sans-serif
+}
+
+div.HeadingType {
+    position: relative;
+    float: right;
+    right: 0;
+    top: 0;
+    padding: 10px;
+    border: thin black inset;
+}
+
+div.TopicalTerm {
+    background-color: #cfc;
+}
+
+li.listTopicalTerm {
+    border-left: medium #cfc solid;
+    border-bottom: medium #cfc solid;
+}
+
+.facets li {
+    padding-left: 5px;
+}
+
+dl.searchResults {
+    padding-top: 10px;
+}
+
+dt {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+dd {
+    padding-left: 5px;
+    font-style: oblique;
+    padding-bottom: 5px;
+}
+dt.listTopicalTerm {
+    border-left: medium #cfc solid;    
+    border-right: medium #cfc solid;
+}
+
+dt.listTopicalTerm:hover {
+    background-color: #cfc;   
+        
+}
+
+div.UniformTitle {
+    background-color: #fcc;
+}
+
+dt.listUniformTitle {
+    border-left: medium #fcc solid;
+    border-right: medium #fcc solid;    
+}
+dt.listUniformTitle:hover {
+    background-color: #fcc;
+}
+
+li.listUniformTitle {
+    border-left: medium #fcc solid;
+    border-bottom: medium #fcc solid;    
+}
+
+div.PersonalName {
+    background-color: #ccf;
+}
+
+dt.listPersonalName {
+    border-right: medium #ccf solid;
+    border-left: medium #ccf solid;    
+}
+dt.listPersonalName:hover {
+    background-color: #ccf;
+}
+
+li.listPersonalName {
+    border-left: medium #ccf solid;
+    border-bottom: medium #ccf solid;    
+}
+
+div.CorporateName {
+    background-color: #cff;
+}
+
+dt.listCorporateName {
+    border-left: medium #cff solid;
+    border-right: medium #cff solid;    
+}
+dt.listCorporateName:hover {
+    background-color: #cff;
+}
+
+li.listCorporateName {
+    border-left: medium #cff solid;
+    border-bottom: medium #cff solid;    */
+}
+
+div.Meeting {
+    background-color: #fcf;
+}
+
+dt.listMeeting {
+    border-left: medium #fcf solid;
+    border-right: medium #fcf solid;    
+}
+
+dt.listMeeting:hover {
+    background-color: #fcf;
+}
+
+li.listMeeting {
+    border-left: medium #fcf solid;
+    border-bottom: medium #fcf solid;    
+}
+
+div.GeographicalName {
+    background-color: #ffc;
+}
+
+dt.listGeographicalName {
+    border-left: medium #ffc solid;
+    border-right: medium #ffc solid;
+}
+
+dt.listGeographicalName:hover {
+    background-color: #ffc;
+}
+li.listGeographicalName {
+    border-left: medium #ffc solid;
+    border-bottom: medium #ffc solid;    
+}
+
+div.GenreFormTerm {
+    background-color: #ccc;
+}
+
+dt.listGenreFormTerm {
+    border-left: medium #ccc solid;
+    border-right: medium #ccc solid;    
+}
+
+dt.listGenreFormTerm:hover {
+    background-color: #ccc;
+}
+
+li.listGenreFormTerm {
+    border-left: medium #ccc solid;
+    border-bottom: medium #ccc solid;    
+}
+
+a:link {
+    text-decoration: none;
+}
+a:visited {
+    text-decoration: none;    
+    color: blue;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+
+div.labels {
+    float: left;
+    width: 80%;
+}
+
+div.labels ul li {
+    list-style-type:none;       
+}
+
+div.altLabels {
+    font-style: oblique;
+}
+div.meta {
+    clear:both;
+}
+
+div.meta div {
+    padding: 5px;
+}
+
+div.meta ul li {
+    list-style-type:none;       
+}
+
+div.nav {
+    clear: left;
+    float: right;
+    top:0;
+    right:0;
+    width: 100%;
+    text-align: right;
+}
+ul.nav {
+    
+}
+
+div.pageLinks {
+    width: 100%;
+}
+
+div.previousLink {
+    float: left;
+}
+
+div.nextLink {
+    float: right;
+}
+ul.nav li {
+  display: inline;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 0px;
+}
+.concept {
+  float: left;
+  padding-left: 3%;
+  padding-right: 0%;
+  padding-top: 0px;
+  background: #fff;
+  border: thin black inset;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 25px;
+  min-height: 500px;
+  width: 75%;
+}
+
+.rightColumn {
+    float: left;
+    width: 20%;
+    padding-left: 0%;
+    padding-bottom: 3%;
+    background: #fff;
+    border: thin black inset; 
+    font-size: small; 
+    text-align: center;
+}
+
+div.downloads {
+    text-align: left;
+}
+ul.browseFromHere, ul.download {
+    text-align: left;
+    list-style-type:none;    
+    line-height: 2em;
+}
+
+ul.facets {
+    text-align: left;
+ 
+    line-height: 2em;
+}
+
+ul.facets li {
+    list-style-type:none;       
+    font-size: small;     
+}
+.searchLeft {
+    width: 20%;
+    float: left;
+}
+
+div.searchResults {
+  padding: 3%;
+  width: 70%;
+  background: #fff;
+  border-top: thin black inset;
+  border-left: thin black inset;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 25px;
+  float: left;
+  clear: right;
+}
+.fields {}

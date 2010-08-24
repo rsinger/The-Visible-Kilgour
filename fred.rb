@@ -3,11 +3,14 @@ require 'ferret'
 require 'marc'
 require 'sinatra'
 require 'cgi'
+require 'yaml'
 
 require 'rack/conneg'
 require 'rack/flash'
 configure do
-  set :db, Ferret::Index::Index.new(:path=>'/Volumes/External/shared/PermaFred/index/fred')
+  config = YAML.load_file("./config.yml")
+  set :config, config
+  set :db, Ferret::Index::Index.new(config['ferret']['config'])
 end
 
 use(Rack::Conneg) { |conneg|
@@ -98,7 +101,6 @@ get '/search/' do
   #  @facets = generate_facets(query, adv_params)
   #else
     @facets = type_facets(adv_params)
-    puts @facets.inspect
   #end
   respond_to do |wants|
     wants.html { haml :search }

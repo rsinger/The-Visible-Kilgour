@@ -4,17 +4,31 @@
     %title #{params[:term]} Group
     %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}    
   %body
-    %h1 Subjects descended from #{params[:term]}
-    - related = []
-    %ul
-      - @terms.each do |term|
-        - if term[:related_str]
-          -related << term[:related_str]
-        %li
-          %a{:href=>"/lccn/#{term[:lccn]}"}= term[:label]
+    .nav
+      %form{:action=>"/search/"}
+        %ul.nav
+          %li
+            %a{:href=>"/"} Home
+          %li
+            %a{:href=>"/browse/"} Browse
+          %li         
+            %input{:type=>"text", :size=>20,:class=>"smallSearch", :name=>"query"}
+            %input{:type=>"submit", :class=>"smallSearch", :value=>"Search"}  
+    .concept
+      %h1 Subjects descended from #{params[:term]}
+      - related = []
+      %ul
+        - @terms.each do |term|
+          - if term[:related_str]
+            -related << term[:related_str]
+          %li
+            %a{:href=>"/lccn/#{term[:lccn]}"}= term[:label]
+            -if term[:alt_labels]  && !term[:alt_labels].empty?
+              %br
+              %em Use for: #{[*term[:alt_labels]].join(", ")}
     - unless related.empty?
       - related.uniq!
-      #relatedTerms
+      .rightColumn
         %strong Related terms:
         %ul
           -related.each do |rel|

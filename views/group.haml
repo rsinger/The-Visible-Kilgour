@@ -17,20 +17,19 @@
     .concept
       %h1 Subjects descended from #{params[:term]}
       - related = []
-      %ul
+      %dl
         - @terms.each do |term|
           - if term[:related_str]
             -related << term[:related_str]
-          %li
+          %dt{:class=>"list#{term[:heading_type].gsub(/[\s\/]/,"")}"}
             %a{:href=>"/lccn/#{term[:lccn]}"}= term[:label]
-            -if term[:alt_labels]  && !term[:alt_labels].empty?
-              %br
-              %em Use for: #{[*term[:alt_labels]].join(", ")}
+          -if term[:alt_labels]  && !term[:alt_labels].empty?
+            %dd{:class=>"list#{term[:heading_type].gsub(/[\s\/]/,"")}"} Use for: #{[*term[:alt_labels]].join(", ")}
     - unless related.empty?
       - related.uniq!
       .rightColumn
         %strong Related terms:
-        %ul
+        %ul.browseFromHere
           -related.each do |rel|
             %li
               %a{:href=>"/label/#{rel}"}= rel

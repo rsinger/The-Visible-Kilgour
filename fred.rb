@@ -7,6 +7,7 @@ require 'sinatra'
 require 'cgi'
 require 'yaml'
 require 'open-uri'
+require 'haml'
 require 'lib/marc_document'
 
 require 'rack/conneg'
@@ -15,6 +16,7 @@ configure do
   config = YAML.load_file("./config.yml")
   set :config, config
   set :db, Ferret::Index::Index.new(config['ferret']['config'])
+  #set :haml, {:encoding=>"utf-8"}
 end
 
 use(Rack::Conneg) { |conneg|

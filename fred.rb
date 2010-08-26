@@ -1,9 +1,13 @@
+$KCODE = 'u'
 require 'rubygems'
+require 'jcode'
 require 'ferret'
 require 'marc'
 require 'sinatra'
 require 'cgi'
 require 'yaml'
+require 'open-uri'
+require 'lib/marc_document'
 
 require 'rack/conneg'
 require 'rack/flash'
@@ -38,6 +42,9 @@ get '/lccn/:id' do
   options.db.search_each("lccn:#{params["id"]}") do |id, score|
     @record = options.db[id]
   end
+  #unless @record[:last_checked_date] && (DateTime.parse(@record[:last_checked_date]) > (DateTime.now() - 30))
+  #  check_for_update(@record)
+  #end
   @record[:marc] = parse_marc(@record[:marc_record])
   respond_to do | wants |
     #wants.rdf { @subject.to_xml() }
@@ -257,6 +264,38 @@ helpers do
     end
     CGI.parse(query_params)
   end 
+  
+  def check_for_update(record)
+    if record[:lccn] =~ /^n/
+      uri = nil
+      unless record[:heading_type] == "Uniform Title" or record[:lccn] =~ /^nb/
+        uri = "http://errol.oclc.org/laf/#{record[:lccn]}.MarcXML"
+      end
+    else
+      uri = "http://tspilot.oclc.org/lcsh/#{record[:lccn]}.marcxml"
+    end
+    return false unless uri
+    response = open(uri)
+    if response
+      begin
+        marc = MARC::XMLReader.new(response)
+        marc_record = nil
+        marc.each do |m|
+          marc_record = m
+        end
+        puts marc_record.to_s
+        return false unless marc_record
+      rescue
+        puts "BOOM"
+        return false
+      end
+      
+      doc = MARCDocument.new(marc_record)
+      puts doc.inspect
+    end
+    
+    
+  end
   
   def paginate(total, offset)
     items_per_page = 25

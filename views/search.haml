@@ -16,16 +16,16 @@
             %input{:type=>"submit", :class=>"smallSearch", :value=>"Search"}  
     .searchLeft
       - heading = nil
-      -@facets.each_pair do |key, facets|
-        - if heading != key
-          .facetSection
-            %strong #{key}
-            %ul.facets
-              - [*facets].each do |label,count|
-                - li_class = (key == :type) ? "list#{label.gsub(/[\s\/]/,"")}" : "facetLabel"
-                %li{:class=>li_class}
-                  %a{:href=>"/search/?#{generate_query_string({key=>label})}"} #{label}
-                  (#{count})
+      - format_facets.each do |facet|
+        - facet.each_pair do |heading,values|
+          %strong= options.config["facets"][:labels][heading]
+          %ul.facets{:class=>"list_#{heading}"}
+            -values.each_cons(2) do |label, count|
+              - li_class = (heading == :heading_type) ? "list#{label.gsub(/[\s\/]/,"")}" : "facetLabel"
+              %li{:class=>li_class}
+                %a{:href=>"/search/?#{generate_query_string({heading=>label})}"} #{label}
+                (#{count})            
+
     .searchResults         
       %h4 #{@total} hits matched your query.
       %dl.searchResults

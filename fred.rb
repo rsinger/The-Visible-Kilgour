@@ -9,6 +9,8 @@ require 'yaml'
 require 'open-uri'
 require 'haml'
 require 'lib/marc_document'
+require 'lib/marc_hash'
+require 'json'
 
 require 'rack/conneg'
 require 'rack/flash'
@@ -53,6 +55,7 @@ get '/lccn/:id' do
     wants.marcxml { @record[:marc].to_xml.to_s}
     wants.mrc { @record[:marc].to_marc }
     wants.html { haml :record }
+    wants.json { @record[:marc].to_hash.to_json }
   end
 end
 
@@ -64,12 +67,12 @@ get '/browse/*' do
     trm = splat unless splat.empty?
   end
   if trm
-    term_enum = options.db.reader.terms_from(:label, trm)
+    term_enum = options.db.reader.terms_from(:label_str, trm)
   else
-    term_enum = options.db.reader.terms(:label)
+    term_enum = options.db.reader.terms(:label_str)
   end
   term_enum.each do |term, count| 
-    options.db.reader.term_docs_for(:label, term).each do |doc_id,freq|
+    options.db.reader.term_docs_for(:label_str, term).each do |doc_id,freq|
       @terms << options.db[doc_id]
     end
     i+= 1
@@ -106,11 +109,11 @@ get '/search/' do
   @total = options.db.search_each(query, {:offset=>@offset, :limit=>25}) do |id, score|
     @results << options.db[id]
   end
-  #if @total < 10000
-  #  @facets = generate_facets(query, adv_params)
-  #else
+  if @total <= options.config['facets'][:threshold]
+    @facets = generate_facets(query)
+  else
     @facets = type_facets(adv_params)
-  #end
+  end
   respond_to do |wants|
     wants.html { haml :search }
   end
@@ -124,22 +127,22 @@ helpers do
   def term_cluster(top_term)
     docs = []
     term = Ferret::Search::TermQuery.new(:top_term_str, top_term)
-    options.db.search_each(term, {:limit=>:all, :sort=>"label DESC"}) do |id, score|
+    options.db.search_each(term, {:limit=>:all, :sort=>"label_str"}) do |id, score|
       docs << options.db[id]
     end
-    docs.reverse
+    docs
   end
   
   def browse_from_here(label)
     i = 0
     terms = []
-    previous(options.db.reader.terms(:label), label, 5).each do |t|
+    previous(options.db.reader.terms(:label_str), label, 5).each do |t|
       options.db.reader.term_docs_for(:label, t).each do |doc_id, freq|
         terms << options.db[doc_id]
       end
     end
-    options.db.reader.terms_from(:label, label).each do |term,count|
-      options.db.reader.term_docs_for(:label, term).each do |doc_id,freq|
+    options.db.reader.terms_from(:label_str, label).each do |term,count|
+      options.db.reader.term_docs_for(:label_str, term).each do |doc_id,freq|
         terms << options.db[doc_id]
       end      
       i+=1
@@ -171,7 +174,7 @@ helpers do
       Ferret::Search::MatchAllQuery.new
     end
     query.add_query(base, :must)
-    {:x=>:x_str, :y=>:y_str, :v=>:v_str, :w=>:w_str, :type=>:heading_type}.each_pair do |filter,index|
+    {:x=>:x_str, :y=>:y_str, :v=>:v_str, :z=>:z_str, :type=>:heading_type}.each_pair do |filter,index|
       next unless params[filter.to_s]
       [*params[filter.to_s]].each do | f |
         phrase = Ferret::Search::PhraseQuery.new(index)
@@ -183,7 +186,8 @@ helpers do
   end
   
   def generate_facets(query)
-    
+    s = options.db.search(query, {:limit=>1, :filter_proc=>filter_proc})
+    return @facet_fields
   end
   
   def type_facets(params)
@@ -208,7 +212,7 @@ helpers do
         facets[type] = top.total_hits
       end
     end
-    return {:type=>facets}
+    return {:heading_type=>facets}
   end
   
   def generate_query_string(extra_params, remove_offset=true)
@@ -245,18 +249,19 @@ helpers do
     query_parts.join("&")
   end    
   
-  def filter_proc(params)
+  def filter_proc
     @facet_fields = {}
-    
-    @filter_proc = lambda do |doc,score,searcher|
-      @facet_fields.keys.each do |field|
-        [*searcher[doc][field]].each do |term|  
-          next if term.nil?
-          @facet_fields[field][term] ||=0
-          @facet_fields[field][term] += 1
-        end
+    options.config["facets"][:fields].each do |field|
+      @facet_fields[field] = {}
+    end
+    fp = lambda do |doc_id,score,searcher|
+      doc = searcher[doc_id]
+      (doc.fields&@facet_fields.keys).each do |key|
+        @facet_fields[key][doc[key]] ||=0
+        @facet_fields[key][doc[key]] += 1        
       end
     end
+    fp
   end
   
   def advanced_params
@@ -284,16 +289,13 @@ helpers do
         marc_record = nil
         marc.each do |m|
           marc_record = m
-        end
-        puts marc_record.to_s
+        end        
         return false unless marc_record
       rescue
-        puts "BOOM"
         return false
       end
       
-      doc = MARCDocument.new(marc_record)
-      puts doc.inspect
+      doc = MARCDocument.new(marc_record)      
     end
     
     
@@ -337,7 +339,21 @@ helpers do
       ranges << (0..total_pages)
     end
     ranges
-  end     
+  end    
+  
+  def format_facets
+    facets = []
+    options.config["facets"][:fields].each do |field|
+      next if !@facets[field] || @facets[field].empty?
+      #@facets[field].each_pair do | facet, values |
+      #  facets << {facet => values.sort{|a,b| b[1]<=>a[1]}[0, options.config["facets"][:limit]]}
+      #end 
+      f = {field => @facets[field].sort{|a,b| b[1]<=>a[1]}}
+      f[field].flatten!
+      facets << f
+    end         
+    facets
+  end 
 end
 
 class String

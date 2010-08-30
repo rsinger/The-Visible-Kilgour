@@ -20,7 +20,7 @@
         - facet.each_pair do |heading,values|
           %strong= options.config["facets"][:labels][heading]
           %ul.facets{:class=>"list_#{heading}"}
-            -values.each_cons(2) do |label, count|
+            -values.each_slice(2) do |label, count|
               - li_class = (heading == :heading_type) ? "list#{label.gsub(/[\s\/]/,"")}" : "facetLabel"
               %li{:class=>li_class}
                 %a{:href=>"/search/?#{generate_query_string({heading=>label})}"} #{label}

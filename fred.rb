@@ -223,9 +223,13 @@ helpers do
         query_parts << "#{key}=#{val}"
       end
     end
+    special_keys = {:x_str=>:x, :y_str=>:y, :v_str=>:v, :z_str=>:z, :heading_type=>:type}
     extra_params.each_pair do |key,vals|
       [*vals].each do |val|
         next unless val
+        if special_keys[key]
+          key = special_keys[key]
+        end
         query_parts << "#{key}=#{val}"
       end
     end

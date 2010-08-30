@@ -25,7 +25,6 @@
               %li{:class=>li_class}
                 %a{:href=>"/search/?#{generate_query_string({heading=>label})}"} #{label}
                 (#{count})            
-
     .searchResults         
       %h4 #{@total} hits matched your query.
       %dl.searchResults

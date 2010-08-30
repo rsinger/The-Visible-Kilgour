@@ -257,8 +257,11 @@ helpers do
     fp = lambda do |doc_id,score,searcher|
       doc = searcher[doc_id]
       (doc.fields&@facet_fields.keys).each do |key|
-        @facet_fields[key][doc[key]] ||=0
-        @facet_fields[key][doc[key]] += 1        
+        [*doc[key]].each do |v|
+          next unless v
+          @facet_fields[key][v] ||=0
+          @facet_fields[key][v] += 1        
+        end
       end
     end
     fp

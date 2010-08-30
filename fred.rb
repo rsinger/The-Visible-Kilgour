@@ -137,7 +137,7 @@ helpers do
     i = 0
     terms = []
     previous(options.db.reader.terms(:label_str), label, 5).each do |t|
-      options.db.reader.term_docs_for(:label, t).each do |doc_id, freq|
+      options.db.reader.term_docs_for(:label_str, t).each do |doc_id, freq|
         terms << options.db[doc_id]
       end
     end
@@ -153,13 +153,13 @@ helpers do
   
   
   def previous(term_enum, term, num)
-    term_enum.skip_to((term[0]-1).chr)
+    term_enum.skip_to((term[0]-1).chr)    
     term_list = []
     term_enum.each do |t,f|
       return term_list if term == t
       term_list.shift if term_list.length > (num-1)
       term_list << t
-    end
+    end    
     term_list
   end
   

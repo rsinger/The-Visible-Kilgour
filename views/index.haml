@@ -3,6 +3,7 @@
   %head
     %title The Visible Kilgour : Searchable, Permalinkable, Downloadable Authority Record
     %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}
+    %link{:rel=>"search", :href=>"/search.osdx", :type=>"application/opensearchdescription+xml"}    
   %body
     %h1 The Visible Kilgour
     .concept
@@ -18,7 +19,7 @@
         through the headings.
       %p
         Fulltext, faceted searching is also provided:
-        %form{:action=>"/search/"}
+        %form{:action=>"/search"}
           %input{:type=>"text", :size=>20,:class=>"smallSearch", :name=>"query"}
           %input{:type=>"submit", :class=>"smallSearch", :value=>"Search"}
         

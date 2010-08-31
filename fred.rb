@@ -11,6 +11,7 @@ require 'haml'
 require 'lib/marc_document'
 require 'lib/marc_hash'
 require 'json'
+require 'builder'
 
 require 'rack/conneg'
 require 'rack/flash'
@@ -24,11 +25,12 @@ end
 use(Rack::Conneg) { |conneg|
   Rack::Mime::MIME_TYPES['.mrc'] = 'application/marc'
   Rack::Mime::MIME_TYPES['.marcxml'] = 'application/marc21+xml'     
+  Rack::Mime::MIME_TYPE['.osdx'] = 'application/opensearchdescription+xml'
   conneg.set :accept_all_extensions, false
   conneg.set :fallback, :html
   conneg.ignore('/public/')
   conneg.ignore('/stylesheets/')
-  conneg.provide([:html, :rdf, :mrc, :marcxml, :json])
+  conneg.provide([:html, :rdf, :mrc, :marcxml, :json, :atom, :osdx])
 }
 
 before do
@@ -88,7 +90,10 @@ end
 get '/group/:term' do
   @terms = term_cluster(params[:term])
   respond_to do |wants|
+    wants.marcxml { array_to_marcxml(@terms) }
+    wants.mrc { array_to_marc(@terms) }
     wants.html { haml :group }
+    wants.json { array_to_marcjson(@terms) }
   end  
 end
 
@@ -98,10 +103,10 @@ get '/label/:term' do
   options.db.search_each(phrase) do |id, score|
     redirect "/lccn/#{options.db[id][:lccn]}"
   end
-  redirect "/search/?query=#{params[:term]}"
+  redirect "/search?query=#{params[:term]}"
 end
 
-get '/search/' do
+get '/search' do
   adv_params = advanced_params
   query = generate_query_object(adv_params)
   @results = []
@@ -109,13 +114,23 @@ get '/search/' do
   @total = options.db.search_each(query, {:offset=>@offset, :limit=>25}) do |id, score|
     @results << options.db[id]
   end
-  if @total <= options.config['facets'][:threshold]
-    @facets = generate_facets(query)
-  else
-    @facets = type_facets(adv_params)
-  end
+
   respond_to do |wants|
-    wants.html { haml :search }
+    wants.html { 
+      if @total <= options.config['facets'][:threshold]
+        @facets = generate_facets(query)
+      else
+        @facets = type_facets(adv_params)
+      end      
+      haml :search
+    }
+    wants.atom {
+      @results.each {|term| term[:marc]=parse_marc(term[:marc_record])}
+      haml :opensearch
+    }
+    wants.osdx {
+      haml :opensearchdescription
+    }
   end
 end
 
@@ -352,15 +367,39 @@ helpers do
     facets = []
     options.config["facets"][:fields].each do |field|
       next if !@facets[field] || @facets[field].empty?
-      #@facets[field].each_pair do | facet, values |
-      #  facets << {facet => values.sort{|a,b| b[1]<=>a[1]}[0, options.config["facets"][:limit]]}
-      #end 
       f = {field => @facets[field].sort{|a,b| b[1]<=>a[1]}}
       f[field].flatten!
       facets << f
     end         
     facets
   end 
+  
+  def array_to_marcxml(docs)
+    out = StringIO.new
+    writer = MARC::XMLWriter.new(out)
+    doc.each do |doc|
+      writer.write(doc[:marc])
+    end
+    out.rewind
+    out.read
+  end
+  def array_to_marc(docs)
+    out = StringIO.new
+    writer = MARC::Writer.new(out)
+    doc.each do |doc|
+      writer.write(doc[:marc])
+    end
+    out.rewind
+    out.read
+  end
+  
+  def array_to_marcjson(doc)
+    out = []
+    doc.each do |doc|
+      out << doc[:marc].to_hash
+    end
+    out.to_json
+  end
 end
 
 class String

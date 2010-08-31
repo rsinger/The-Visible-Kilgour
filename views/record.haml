@@ -3,9 +3,10 @@
   %head
     %title= @record[:label]
     %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}    
+    %link{:rel=>"search", :href=>"/search.osdx", :type=>"application/opensearchdescription+xml"}
   %body
     .nav
-      %form{:action=>"/search/"}
+      %form{:action=>"/search"}
         %ul.nav
           %li
             %a{:href=>"/"} Home
@@ -63,23 +64,23 @@
             %ul
               - [*@record[:x_str]].each do |x|
                 %li
-                  %a{:href=>"/search/?query=#{@record[:top_term_str]}&x=#{x}"}= x
+                  %a{:href=>"/search?query=#{@record[:top_term_str]}&x=#{x}"}= x
         - if @record[:z_str]
           .geogSubd
             %strong Geographic Subdivision:
             - [*@record[:z_str]].each do |z|
-              %a{:href=>"/search/?query=#{@record[:top_term_str]}&z=#{z}"}= z          
+              %a{:href=>"/search?query=#{@record[:top_term_str]}&z=#{z}"}= z          
 
         - if @record[:v_str]
           .formSubd
             %strong Form Subdivision:
             - [*@record[:v_str]].each do |v|
-              %a{:href=>"/search/?query=#{@record[:top_term_str]}&v=#{v}"}= v
+              %a{:href=>"/search?query=#{@record[:top_term_str]}&v=#{v}"}= v
         - if @record[:y_str]
           .chronSubd
             %strong Chronological Subdivision:
             - [*@record[:y_str]].each do |y|
-              %a{:href=>"/search/?query=#{@record[:top_term_str]}&y=#{y}"}= y
+              %a{:href=>"/search?query=#{@record[:top_term_str]}&y=#{y}"}= y
         %h4 MARC:
         .ldr LEADER: #{@record[:marc].leader.to_s}
         - @record[:marc].each do |field|

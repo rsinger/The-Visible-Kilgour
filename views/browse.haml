@@ -3,9 +3,10 @@
   %head
     %title Browse headings
     %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}    
+    %link{:rel=>"search", :href=>"/search.osdx", :type=>"application/opensearchdescription+xml"}    
   %body
     .nav
-      %form{:action=>"/search/"}
+      %form{:action=>"/search"}
         %ul.nav
           %li
             %a{:href=>"/"} Home

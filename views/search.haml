@@ -3,9 +3,10 @@
   %head
     %title Search headings
     %link{:rel=>"stylesheet", :href=>"/stylesheets/style.css", :type=>"text/css", :media=>"screen", :charset=>"utf-8"}
+    %link{:rel=>"search", :href=>"/search.osdx", :type=>"application/opensearchdescription+xml"}    
   %body
     .nav
-      %form{:action=>"/search/"}
+      %form{:action=>"/search"}
         %ul.nav
           %li
             %a{:href=>"/"} Home
@@ -23,7 +24,7 @@
             -values.each_slice(2) do |label, count|
               - li_class = (heading == :heading_type) ? "list#{label.gsub(/[\s\/]/,"")}" : "facetLabel"
               %li{:class=>li_class}
-                %a{:href=>"/search/?#{generate_query_string({heading=>label})}"} #{label}
+                %a{:href=>"/search?#{generate_query_string({heading=>label})}"} #{label}
                 (#{count})            
     .searchResults         
       %h4 #{@total} hits matched your query.
@@ -38,14 +39,14 @@
       - if pages = paginate(@total, @offset)
         .paginator
           - if @offset > 0
-            %a{:href=>"/search/?#{generate_offset_query(@offset-25)}"} <<
+            %a{:href=>"/search?#{generate_offset_query(@offset-25)}"} <<
           - pages.each do |page|
             - if page.is_a?(Range)
               - page.each do |p|
-                %a{:href=>"/search/?#{generate_offset_query(p*25)}"} #{p+1}
+                %a{:href=>"/search?#{generate_offset_query(p*25)}"} #{p+1}
             - elsif page.is_a?(String)
               #{"..."}
             - elsif page.is_a?(Fixnum)
-              %a{:href=>"/search/?#{generate_offset_query(p*25)}"} #{p+1}
+              %a{:href=>"/search?#{generate_offset_query(p*25)}"} #{p+1}
           - if @offset < (@offset - 25)
-            %a{:href=>"/search/?#{generate_offset_query(@offset+25)}"} >>              
+            %a{:href=>"/search?#{generate_offset_query(@offset+25)}"} >>              

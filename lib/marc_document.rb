@@ -306,5 +306,11 @@ class MARCDocument < Ferret::Document
     self[:marc_record] = marc.to_marc
     self[:last_modified] = DateTime.now
   end
+  
+  def compare_last_modified(other)
+    return :less_than if other[:marc_last_modified] > self[:marc_last_modified]
+    return :equal if other[:marc_last_modified] == self[:marc_last_modified]
+    return :greater_than
+  end
 
 end

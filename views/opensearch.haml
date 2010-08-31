@@ -1,0 +1,41 @@
+!!!XML
+%feed{:xmlns=>"http://www.w3.org/2005/Atom",:"xmlns:os"=>"http://a9.com/-/spec/opensearch/1.1/"}
+  %title The Visible Kilgour: search for #{params[:query]}
+  %link{:href=>request.env['REQUEST_URI']}
+  %updated= DateTime.now.to_s
+  %author
+    %name fred.lcsubjects.org
+  %id= request.env['REQUEST_URI']
+  <os:totalResults>#{@total}</os:totalResults>
+  <os:startIndex>#{@offset}</os:startIndex>
+  <os:itemsPerPage>25</os:itemsPerPage>
+  %link{:rel=>"alternate", :href=>"/search?#{generate_query_string({})}", :type=>"text/html"}
+  %link{:ref=>"self", :href=>"/search.atom?#{generate_query_string({})}", :type=>"application/atom+xml"}
+  %link{:ref=>"first", :href=>"/search.atom?#{generate_offset_query(0)}", :type=>"application/atom+xml"}
+  -if @offset > 0
+    - prev = @offset-25
+    - prev = 0 if prev < 0
+    %link{:rel=>"previous", :href=>"/search.atom?#{generate_offset_query(prev)}", :type=>"application/atom+xml"}
+  -if (@offset+25) < @total
+    %link{:rel=>"next", :href=>"/search.atom?#{generate_offset_query(@offset+25)}", :type=>"application/atom+xml"}
+  -if @total > 25
+    %link{:rel=>"last", :href=>"/search.atom?#{generate_offset_query(@total-25)}", :type=>"application/atom+xml"}
+
+  %link{:rel=>"search", :type=>"application/opensearchdescription+xml", :href=>"/search.osdx"}
+
+  
+  -@results.each do |term|
+    %entry
+      %title= term[:label]
+      %link{:href=>"http://fred.lcsubjects.org/lccn/#{term[:lccn]}.html"}
+      %link{:href=>"http://fred.lcsubjects.org/lccn/#{term[:lccn]}.marc", :rel=>"alternate", :type=>"application/marc"}      
+      %link{:href=>"http://fred.lcsubjects.org/lccn/#{term[:lccn]}.marcxml", :rel=>"alternate", :type=>"application/marc+xml"}            
+      %link{:href=>"http://fred.lcsubjects.org/lccn/#{term[:lccn]}.json", :rel=>"alternate", :type=>"application/json"}            
+      %id http://fred.lcsubjects.org/lccn/#{term[:lccn]}
+      %updated= term[:last_modified]
+      %published= term[:marc_last_modified]
+      %summary= term[:marc].to_s
+      %content{:type=>"text/xml"}= term[:marc].to_xml
+      %contributor
+        %name= term[:source]
+  

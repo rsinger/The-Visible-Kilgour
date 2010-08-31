@@ -9,19 +9,20 @@
   <os:totalResults>#{@total}</os:totalResults>
   <os:startIndex>#{@offset}</os:startIndex>
   <os:itemsPerPage>25</os:itemsPerPage>
-  %link{:rel=>"alternate", :href=>"/search?#{generate_query_string({})}", :type=>"text/html"}
-  %link{:ref=>"self", :href=>"/search.atom?#{generate_query_string({})}", :type=>"application/atom+xml"}
-  %link{:ref=>"first", :href=>"/search.atom?#{generate_offset_query(0)}", :type=>"application/atom+xml"}
+  -unless request.env["PATH_INFO"] == "/feed"
+    %link{:rel=>"alternate", :href=>"#{request.env["PATH_INFO"]}?#{generate_query_string({})}", :type=>"text/html"}
+  %link{:ref=>"self", :href=>"#{request.env["PATH_INFO"]}.atom?#{generate_query_string({})}", :type=>"application/atom+xml"}
+  %link{:ref=>"first", :href=>"#{request.env["PATH_INFO"]}.atom?#{generate_offset_query(0)}", :type=>"application/atom+xml"}
   -if @offset > 0
     - prev = @offset-25
     - prev = 0 if prev < 0
-    %link{:rel=>"previous", :href=>"/search.atom?#{generate_offset_query(prev)}", :type=>"application/atom+xml"}
+    %link{:rel=>"previous", :href=>"#{request.env["PATH_INFO"]}.atom?#{generate_offset_query(prev)}", :type=>"application/atom+xml"}
   -if (@offset+25) < @total
-    %link{:rel=>"next", :href=>"/search.atom?#{generate_offset_query(@offset+25)}", :type=>"application/atom+xml"}
+    %link{:rel=>"next", :href=>"#{request.env["PATH_INFO"]}.atom?#{generate_offset_query(@offset+25)}", :type=>"application/atom+xml"}
   -if @total > 25
-    %link{:rel=>"last", :href=>"/search.atom?#{generate_offset_query(@total-25)}", :type=>"application/atom+xml"}
+    %link{:rel=>"last", :href=>"#{request.env["PATH_INFO"]}.atom?#{generate_offset_query(@total-25)}", :type=>"application/atom+xml"}
 
-  %link{:rel=>"search", :type=>"application/opensearchdescription+xml", :href=>"/search.osdx"}
+  %link{:rel=>"search", :type=>"application/opensearchdescription+xml", :href=>"/#{request.env["PATH_INFO"]}?.osdx"}
 
   
   -@results.each do |term|

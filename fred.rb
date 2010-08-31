@@ -25,7 +25,7 @@ end
 use(Rack::Conneg) { |conneg|
   Rack::Mime::MIME_TYPES['.mrc'] = 'application/marc'
   Rack::Mime::MIME_TYPES['.marcxml'] = 'application/marc21+xml'     
-  Rack::Mime::MIME_TYPE['.osdx'] = 'application/opensearchdescription+xml'
+  Rack::Mime::MIME_TYPES['.osdx'] = 'application/opensearchdescription+xml'
   conneg.set :accept_all_extensions, false
   conneg.set :fallback, :html
   conneg.ignore('/public/')
@@ -105,6 +105,20 @@ get '/label/:term' do
   end
   redirect "/search?query=#{params[:term]}"
 end
+
+get '/feed' do
+  @results = []
+  @offset = (params["offset"]||0).to_i
+  @total = options.db.search_each(Ferret::Search::MatchAllQuery.new, {:offset=>@offset, :limit=>25, :sort=>"last_modified DESC"}) do |id, score|
+    @results << options.db[id]
+  end
+  respond_to do | wants |
+    wants.atom {
+      @results.each {|term| term[:marc]=parse_marc(term[:marc_record])}
+      haml :opensearch
+    }  
+  end 
+end 
 
 get '/search' do
   adv_params = advanced_params

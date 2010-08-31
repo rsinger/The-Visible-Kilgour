@@ -22,7 +22,7 @@
   -if @total > 25
     %link{:rel=>"last", :href=>"#{request.env["PATH_INFO"]}.atom?#{generate_offset_query(@total-25)}", :type=>"application/atom+xml"}
 
-  %link{:rel=>"search", :type=>"application/opensearchdescription+xml", :href=>"/#{request.env["PATH_INFO"]}?.osdx"}
+  %link{:rel=>"search", :type=>"application/opensearchdescription+xml", :href=>"/search.osdx"}
 
   
   -@results.each do |term|
